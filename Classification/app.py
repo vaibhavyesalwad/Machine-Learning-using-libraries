@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import joblib
 import sys
+from scipy.sparse.csr import csr_matrix
 
 sys.path.append('/home/admin1/PycharmProjects/Machine Learning using libraries')
 from ipynb.fs.full.ml_library import *
@@ -61,36 +62,22 @@ def data_processing_hiv(name):
     # creating pandas dataframe from python dictionary
     data = pd.DataFrame(data_fr_predict, index=[0])
 
+    # loading pickled object of random  forest classifier model for HIV dataset
+    file = open('DataProcessingHIV.pkl', 'rb')
+    feature = joblib.load(file)
+    label = joblib.load(file)
+    one_hot_encode = joblib.load(file)
+    file.close()
+
+    # separating string of 8 characters into 8 different features
+    x_values = separate_feature_column(data, feature)
+
+    # using encoding same as encoding used while data pre-processing prior to model building
+    x_values = one_hot_encode.transform(x_values)
+
+    # for GaussianNB model converting sparse matrix to dense matrix
     if name == 'GaussianNB':
-        file = open('DataProcessingGaussianNBHIV.pkl', 'rb')
-        feature = joblib.load(file)
-        label = joblib.load(file)
-        lbl_encode = joblib.load(file)
-        file.close()
-
-        # separating string of 8 characters into 8 different features
-        x_values = separate_feature_column(data, feature)
-        # label encoder works on 1D array only
-        x_values = x_values.flatten()
-        # using encoding same as encoding used while data pre-processing prior to model building
-        x_values = lbl_encode.transform(x_values)
-
-        # changing values to interger numpy int32 datatypes & reshaping feature matrix to 2D array for classifier
-        x_values = x_values.astype('int32').reshape(-1, 1)
-
-    else:
-        # loading pickled object of random  forest classifier model for HIV dataset
-        file = open('DataProcessingHIV.pkl', 'rb')
-        feature = joblib.load(file)
-        label = joblib.load(file)
-        one_hot_encode = joblib.load(file)
-        file.close()
-
-        # separating string of 8 characters into 8 different features
-        x_values = separate_feature_column(data, feature)
-
-        # using encoding same as encoding used while data pre-processing prior to model building
-        x_values = one_hot_encode.transform(x_values)
+        x_values = csr_matrix(x_values).todense()
 
     y_values = data[label].values
 

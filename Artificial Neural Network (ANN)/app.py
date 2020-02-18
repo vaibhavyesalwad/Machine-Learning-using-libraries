@@ -19,6 +19,7 @@ def data_processing():
     # creating pandas data frame from python dictionary
     data = pd.DataFrame(data_fr_predict, index=[0])
 
+    # unpickling objects necessary for data pre processing
     with open('DataProcessingBank.pkl', 'rb') as file:
         features = joblib.load(file)
         label = joblib.load(file)
@@ -27,6 +28,7 @@ def data_processing():
         oh_enc = joblib.load(file)
         sc_x = joblib.load(file)
 
+    # performing data transform steps as same as before model building
     x_values = data.loc[:, features].values
     new_x_values = data.loc[:, oh_enc_column].values
     y_values = data.loc[:, label].values
@@ -41,10 +43,10 @@ def data_processing():
 
 @app.route("/ANN/Bank", methods=["POST"])
 def predict_cust_exit():
-    # getting feature matrix & label for Restaurant Review data set
+    # getting feature matrix & label for Bank Churn data set
     x_values, y_values = data_processing()
 
-    # loading pickled object of random  forest classifier model Restaurant Review data set
+    # loading pickled object of random  forest classifier model for Bank Churn  data set
     file = open('ANNModelBank.pkl', 'rb')
     classifier = joblib.load(file)
     file.close()

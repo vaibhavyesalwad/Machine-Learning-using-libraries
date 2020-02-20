@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import sys
+import tensorflow as tf
 
 sys.path.append('/home/admin1/PycharmProjects/Machine Learning using libraries')
 from ipynb.fs.full.ml_library import *
@@ -46,10 +47,9 @@ def predict_cust_exit():
     # getting feature matrix & label for Bank Churn data set
     x_values, y_values = data_processing()
 
-    # loading pickled object of random  forest classifier model for Bank Churn  data set
-    file = open('ANNModelBank.pkl', 'rb')
-    classifier = joblib.load(file)
-    file.close()
+    # loading saved ANN classifier model for Bank Churn  data set
+    classifier = tf.keras.models.load_model('ANNModelBank.h5')
+    print(classifier.summary())
 
     # predicting for a given observation
     prediction = classifier.predict(x_values)
